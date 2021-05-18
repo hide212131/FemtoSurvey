@@ -1,0 +1,18 @@
+type SurveyForm @model {
+  id: ID!
+  name: String!
+  description: String
+  model: String!
+  createdBy: String!
+  inputKey: String!
+  resultKey: String!
+  results: [SurveyInput] @connection(keyName: "byForm", fields: ["id"])
+}
+
+type SurveyInput @model @key(name: "byForm", fields: ["formID", "content"]) {
+  id: ID!
+  formID: ID!
+  createdBy: String!
+  form: SurveyForm @connection(fields: ["formID"])
+  content: String!
+}

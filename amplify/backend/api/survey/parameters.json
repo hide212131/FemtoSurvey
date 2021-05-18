@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "survey",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authsurvey05b61a15",
+      "Outputs.UserPoolId"
+    ]
+  }
+}
