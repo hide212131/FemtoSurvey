@@ -5,11 +5,8 @@ import { useParams } from "react-router-dom";
 import { ListSurveyFormsQuery } from "./API";
 import * as Survey from "survey-react";
 import { createSurveyInput, updateSurveyInput } from "./graphql/mutations";
-import {
-  makeStyles,
-  Paper,
-  Typography,
-} from "@material-ui/core";
+import { makeStyles, Paper, Typography } from "@material-ui/core";
+import { parseISO, format, isEqual } from "date-fns";
 //Define Survey JSON
 //Here is the simplest Survey with one text question
 const useStyles = makeStyles((theme) => ({
@@ -84,6 +81,8 @@ const SurveyInput = () => {
   console.log("SurveyInput render");
   const { inputKey } = useParams<{ inputKey: string }>();
   const [id, setID] = useState<string>();
+  const [createdAt, setCreatedAt] = useState<Date>();
+  const [updatedAt, setUpdatedAt] = useState<Date>();
   // const [input, setInput] = useState<Input>();
   const [form, setForm] = useState<Form>();
   const [model, setModel] = useState<Survey.ReactSurveyModel>(
@@ -112,6 +111,8 @@ const SurveyInput = () => {
               items {
                 id
                 content
+                createdAt
+                updatedAt
               }
             }
             id
@@ -138,6 +139,10 @@ const SurveyInput = () => {
         const item = datas[0];
         model.data = JSON.parse(item.content);
         setID(item.id);
+        setCreatedAt(parseISO(item.createdAt));
+        if (item.updatedAt) {
+          setUpdatedAt(parseISO(item.updatedAt));
+        }
       }
       setModel(model);
     }
@@ -175,14 +180,43 @@ const SurveyInput = () => {
         console.log("error creating todo:", err);
       }
     }
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
   };
+
+  const dateInfo = () =>
+    createdAt && updatedAt ? (
+      <>
+        <Typography variant="h5" align="center" component="h1" gutterBottom>
+          Answered at{" "}
+          {format(
+            isEqual(createdAt, updatedAt) ? createdAt : updatedAt,
+            "yyyy/MM/dd HH:mm:ss"
+          )}
+        </Typography>
+        {!isEqual(createdAt, updatedAt) ? (
+          <Typography variant="h5" align="center" component="h1" gutterBottom>
+            {updatedAt ? "The first answer was" : "Answered"} at{" "}
+            {format(createdAt, "yyyy/MM/dd HH:mm:ss")}
+          </Typography>
+        ) : (
+          <></>
+        )}
+      </>
+    ) : (
+      <></>
+    );
 
   return form ? (
     <React.Fragment>
       <div className={classes.header}>
         <Typography variant="h4" align="center" component="h1" gutterBottom>
-          Answer the Survey
+          {id
+            ? "Thank you for your response to the survey."
+            : "Answer the Survey."}
         </Typography>
+        {dateInfo()}
         <Typography
           variant="h5"
           align="center"
@@ -190,8 +224,9 @@ const SurveyInput = () => {
           gutterBottom
         ></Typography>
         <Typography paragraph align="center">
-          Please fill out the following survey form and click the "Complate"
-          button.
+          {id
+            ? 'Edit the following and click the "Complate" button again to update your answer.'
+            : 'Please fill out the following survey form and click the "Complate" button.'}
         </Typography>
       </div>
       <Paper className={classes.paper}>
