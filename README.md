@@ -1,6 +1,6 @@
 # FemtoSurvey (prototype)
 
-A minimal survey application using [surveyjs/survey-library](https://github.com/surveyjs/survey-library) and [jspreadsheet/ce](https://github.com/jspreadsheet/ce), a great libraries.
+A minimal survey application using [surveyjs/survey-library](https://github.com/surveyjs/survey-library) and [jspreadsheet/ce](https://github.com/jspreadsheet/ce), etc..,a great libraries.
 
 ## Features
 - Spreadsheet widgets (tabular and matrix) included
@@ -8,3 +8,5 @@ A minimal survey application using [surveyjs/survey-library](https://github.com/
 
 ## License
 MIT License
+
+This software includes the work that is distributed in the Apache License 2.0.

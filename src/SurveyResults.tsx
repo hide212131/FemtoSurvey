@@ -1,11 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { GraphQLResult } from "@aws-amplify/api-graphql";
 import { ListSurveyFormsQuery } from "./API";
 import { API, graphqlOperation } from "aws-amplify";
 import { JExcelElement } from "jexcel";
 import jsonorder from "json-order";
+import XLSX from "xlsx";
+import { Button, makeStyles } from "@material-ui/core";
+import { SaveAlt } from "@material-ui/icons";
 const jspreadsheet = require("jspreadsheet-ce");
+
+const useStyles = makeStyles((theme) => ({
+  button: {
+    marginTop: theme.spacing(1),
+    marginLeft: theme.spacing(1),
+  },
+}));
 
 interface Input {
   id: string;
@@ -22,9 +32,11 @@ interface Form {
 }
 
 const SurveyResults = () => {
+  const classes = useStyles();
   const { resultKey } = useParams<{ resultKey: string }>();
   const sheetRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState<Form>();
+  const [spreadSheet, setSpreadSheet] = useState<JExcelElement>();
   //const [inputs, setInputs] = useState<Input[]>([]);
   // const [spreadsheet, setSpreadsheet] = useState(null);
 
@@ -101,7 +113,20 @@ const SurveyResults = () => {
         });
       });
       jss.refresh();
+      setSpreadSheet(jss);
     }
+  };
+
+  const handleDownload = () => {
+    const data = [
+      spreadSheet?.getHeaders([]),
+      ...(spreadSheet?.getData() as any[][]),
+    ];
+    console.log(data);
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "results");
+    XLSX.writeFile(wb, "results.xlsx");
   };
 
   return (
@@ -109,6 +134,17 @@ const SurveyResults = () => {
       <h2>Results</h2>
       <div>{form?.name}</div>
       <div>{form?.description}</div>
+      <div>
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          startIcon={<SaveAlt />}
+          onClick={handleDownload}
+        >
+          Download(XLSX)
+        </Button>
+      </div>
       <div id="spreadsheet" ref={sheetRef}></div>
     </div>
   );
