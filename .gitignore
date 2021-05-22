@@ -43,3 +43,4 @@ amplifytools.xcconfig
 .secret-*
 amplify/team-provider-info.json
 amplify/backend/function/itemsLambda/.env
+amplify/backend/api/survey/resolvers/*.vtl

@@ -46,11 +46,6 @@
     }
   },
   "function": {
-    "resultsLambda": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
     "itemsLambda": {
       "build": true,
       "providerPlugin": "awscloudformation",
