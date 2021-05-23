@@ -8,7 +8,7 @@ import "jspreadsheet-ce/dist/jspreadsheet.theme.css";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { API, Auth, graphqlOperation } from "aws-amplify";
 import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { createSurveyForm } from "./graphql/mutations";
+import { createSurveyForm, updateSurveyForm } from "./graphql/mutations";
 import * as uuid from "uuid";
 import {
   FormControl,
@@ -223,12 +223,27 @@ const SurveyForm = () => {
   const createSurvey = async () => {
     try {
       setLoading(true);
-      const input: Form = {
-        ...formState,
-        inputKey: uuid.v4(),
-        resultKey: uuid.v4(),
-      };
-      await API.graphql(graphqlOperation(createSurveyForm, { input }));
+      if (formID) {
+        const input = {
+          id: formID,
+          name: formState.name,
+          description: formState.description,
+          model: formState.model,
+        };
+        await API.graphql(graphqlOperation(updateSurveyForm, { input }));
+        window.location.reload();
+      } else {
+        const input: Form = {
+          ...formState,
+          inputKey: uuid.v4(),
+          resultKey: uuid.v4(),
+        };
+        const result = await API.graphql(
+          graphqlOperation(createSurveyForm, { input })
+        );
+        const id = (result as any).data.createSurveyForm.id;
+        window.location.href = `/update/${id}`;
+      }
       setMessage("success");
     } catch (err) {
       console.log(err);
@@ -522,7 +537,7 @@ const SurveyForm = () => {
               }
               onClick={createSurvey}
             >
-              create survey
+              {formID ? "update" : "create"} survey
             </Button>
             <Backdrop className={classes.backdrop} open={loading}>
               <CircularProgress color="inherit" />
