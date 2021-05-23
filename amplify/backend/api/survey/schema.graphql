@@ -1,4 +1,4 @@
-type SurveyForm @model {
+type SurveyForm @model @aws_api_key @aws_cognito_user_pools {
   id: ID!
   name: String!
   description: String
@@ -9,7 +9,11 @@ type SurveyForm @model {
   results: [SurveyInput] @connection(keyName: "byForm", fields: ["id"])
 }
 
-type SurveyInput @model @key(name: "byForm", fields: ["formID", "content"]) {
+type SurveyInput
+  @model
+  @key(name: "byForm", fields: ["formID", "content"])
+  @aws_api_key
+  @aws_cognito_user_pools {
   id: ID!
   formID: ID!
   createdBy: String!

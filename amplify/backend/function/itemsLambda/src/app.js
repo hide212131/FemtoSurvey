@@ -1,11 +1,16 @@
-/*
+/* Amplify Params - DO NOT EDIT
+	API_SURVEY_GRAPHQLAPIENDPOINTOUTPUT
+	API_SURVEY_GRAPHQLAPIIDOUTPUT
+	API_SURVEY_GRAPHQLAPIKEYOUTPUT
+	ENV
+	REGION
+Amplify Params - DO NOT EDIT *//*
 Copyright 2017 - 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
     http://aws.amazon.com/apache2.0/
 or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
 */
-
 
 
 
@@ -30,9 +35,11 @@ app.use(function(req, res, next) {
  * Example get method *
  **********************/
 
-app.get('/items', function(req, res) {
+app.get('/items', async function(req, res) {
   // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
+  const items = await getItems(req.query.resultKey)
+  console.log('items',items)
+  res.json(items);
 });
 
 
@@ -49,8 +56,102 @@ app.get('/items/*', function(req, res) {
 
 app.post('/items', function(req, res) {
   // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
+  //res.json()
 });
+
+const axios = require('axios');
+const gql = require('graphql-tag');
+const graphql = require('graphql');
+const { print } = graphql;
+
+/*
+const listTodos = gql`query MyQuery {
+  listSurveyInputs {
+    items {
+      content
+    }
+  }
+}
+`
+*/
+
+const listTodos = gql`
+query Query($resultKey: String!) {
+  listSurveyForms(
+    filter: {resultKey: {eq: $resultKey}}
+  ) {
+    items {
+      id
+      name
+      description
+      model
+      results {
+        items {
+          id
+          content
+          createdBy
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  }
+}
+`;
+
+
+const getItems = async (resultKey) => {
+  // console.log(process.env);
+  try {   
+    const result = await axios({
+      url: process.env.API_SURVEY_GRAPHQLAPIENDPOINTOUTPUT,
+      method: 'post',
+      headers: {
+        'x-api-key': process.env.API_SURVEY_GRAPHQLAPIKEYOUTPUT
+      },
+      data: {
+        query: print(listTodos),
+        variables: { resultKey },
+        authMode: 'API_KEY'
+      }
+    });    
+
+    console.log(result);
+
+    let statusCode;
+    let body;
+    if (result.data?.data) {
+      const items = result.data.data?.listSurveyForms?.items;
+      if (items && items.length > 0 && items[0]) {
+        const form = items[0];
+        const inputs = form.results?.items;        
+        statusCode = 200
+        body = inputs.map(i => {
+          try {
+            i.content = JSON.parse(i["content"]);
+          } catch (e) {}
+          return i;
+        });
+      } else {
+        statusCode = 400
+        body = 'NOT FOUND.'
+      }
+    } else {
+      statusCode = 500;
+      body = result.data?.errors;
+    }
+
+    return {
+      statusCode,
+      body,
+      headers: {
+          "Access-Control-Allow-Origin": "*",
+      }
+    }      
+  } catch (err) {
+    console.log('error posting to appsync: ', err);
+  } 
+}
 
 app.post('/items/*', function(req, res) {
   // Add your code here
