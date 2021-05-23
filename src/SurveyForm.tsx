@@ -176,6 +176,7 @@ const SurveyForm = () => {
   const [keyNumber, setKeyNumber] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>();
+  const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
     if (formID) {
@@ -244,7 +245,10 @@ const SurveyForm = () => {
     updateModel(
       componentList.map((comp, i) => {
         if (i === index) {
-          return createComponent(event.target.value) ?? comp;
+          return (
+            createComponent(event.target.value) ??
+            ({ ...comp, content: event.target.value } as Component) // invalid JSON format onTextChange
+          );
         } else {
           return comp;
         }
@@ -264,6 +268,7 @@ const SurveyForm = () => {
 
   const updateModel = (newComponentList: Component[]) => {
     setComponentList(newComponentList);
+    setError(false);
     setInput(
       "model",
       newComponentList.length === 0
@@ -273,7 +278,8 @@ const SurveyForm = () => {
               try {
                 return JSON.parse(comp.content);
               } catch (e) {
-                return {};
+                setError(true);
+                return { error: true, type: "html", html: `ERROR: ${e}` };
               }
             }),
           })
@@ -508,6 +514,7 @@ const SurveyForm = () => {
               color="primary"
               className={classes.button}
               disabled={
+                error ||
                 loading ||
                 !formState.name ||
                 !formState.description ||
