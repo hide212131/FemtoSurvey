@@ -31,6 +31,13 @@ interface Form {
   model: string;
 }
 
+interface Component {
+  type: string;
+  name: string;
+  title: string;
+  content: string;
+}
+
 const SurveyResults = () => {
   const classes = useStyles();
   const { resultKey } = useParams<{ resultKey: string }>();
@@ -79,22 +86,34 @@ const SurveyResults = () => {
     if (items && items.length > 0 && items[0]) {
       const form = items[0] as Form;
       setForm(form);
+      const columns = createColumns(form);
       const inputs = (form as any).results?.items as Input[];
-      setInputs(inputs);
+      setInputs(columns, inputs);
       console.log(inputs);
     }
   };
 
-  const setInputs = (inputs: Input[]) => {
+  const createColumns = (form: Form): { title: string; width: number }[] => {
+    const columns: { title: string; width: number }[] = (JSON.parse(form.model)
+      .elements as {
+      name: string;
+    }[]).map((el) => {
+      return { title: el.name, width: 100 };
+    });
+    return [
+      { title: "id", width: 100 },
+      ...columns,
+      { title: "createdAt", width: 100 },
+      { title: "updatedAt", width: 100 },
+    ];
+  };
+
+  const setInputs = (
+    columns: { title: string; width: number }[],
+    inputs: Input[]
+  ) => {
     if (inputs.length > 0) {
       // create header & jss instance
-      const content = inputs[0].content;
-      const columns: { title: string; width: number }[] = [
-        { title: "id", width: 100 },
-        ...((jsonorder.parse(content) as any).map.$ as string[]).map((name) => {
-          return { title: name, width: 300 };
-        }),
-      ];
       const jss: JExcelElement = jspreadsheet(sheetRef.current, {
         columns,
         editable: false,
@@ -102,7 +121,12 @@ const SurveyResults = () => {
 
       // create rows
       inputs.forEach((input, rowIndex) => {
-        const data = { id: input.id, ...JSON.parse(input.content) };
+        const data = {
+          id: input.id,
+          ...JSON.parse(input.content),
+          createdAt: input.createdAt,
+          updatedAt: input.createdAt,
+        };
         // console.log(data);
         jss.insertRow();
         columns.forEach((column, columnIndex) => {
