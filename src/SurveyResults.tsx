@@ -125,7 +125,7 @@ const SurveyResults = () => {
           id: input.id,
           ...JSON.parse(input.content),
           createdAt: input.createdAt,
-          updatedAt: input.createdAt,
+          updatedAt: input.updatedAt,
         };
         // console.log(data);
         jss.insertRow();
