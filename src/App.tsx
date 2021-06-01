@@ -31,6 +31,17 @@ import MenuIcon from "@material-ui/icons/Menu";
 import "./jspreadsheet.css";
 import SurveyDashboard from "./SurveyDashboard";
 import { Create, Dashboard } from "@material-ui/icons";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import * as Survey from "survey-react";
+import $ from "jquery";
+import "select2";
+import "select2/dist/css/select2.min.css";
+import * as widgets from "surveyjs-widgets";
+
+window["$"] = window["jQuery"] = $;
+widgets.select2(Survey);
+widgets.select2tagbox(Survey);
+
 
 const useStyles = makeStyles((theme) => ({
   list: {

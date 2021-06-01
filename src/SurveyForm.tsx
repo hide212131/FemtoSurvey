@@ -144,6 +144,19 @@ const template: StringKeyObject = {
     colCount: 4,
     choices: ["None", "Nissan", "BMW", "Toyota"],
   },
+  dropdown: {
+    isRequired: true,
+    choices: ["None", "Nissan", "BMW", "Toyota"],
+  },
+  select2: {
+    renderAs: "select2",
+    isRequired: true,
+    choices: ["None", "Nissan", "BMW", "Toyota"],
+  },
+  tagbox: {
+    isRequired: true,
+    choices: ["None", "Nissan", "BMW", "Toyota"],
+  },
   checkbox: {
     isRequired: true,
     colCount: 4,
@@ -158,6 +171,9 @@ const compKeySelect: Array<{ key: string; type: string; value: string }> = [
   { key: "text", type: "text", value: "TextField" },
   { key: "comment", type: "comment", value: "MultilineText" },
   { key: "radiogroup", type: "radiogroup", value: "RadioGroup" },
+  { key: "dropdown", type: "dropdown", value: "Dropdown" },
+  { key: "select2", type: "dropdown", value: "Select2" },
+  { key: "tagbox", type: "tagbox", value: "Tagbox" },
   { key: "checkbox", type: "checkbox", value: "Checkbox" },
   { key: "boolean", type: "boolean", value: "Yes/No" },
   { key: "table", type: "spreadsheet", value: "Table" },
