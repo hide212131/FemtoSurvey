@@ -92,11 +92,30 @@ const SurveyInput = () => {
   console.log("model.data", model.data);
 
   useEffect(() => {
-    fetchForm();
+    fetchAndSetFormAndItems();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchForm = async () => {
+  const fetchAndSetFormAndItems = async () => {
+    const result = await fetchFormAndItem();
+    const form = getFormByResult(result);
+    if (form) {
+      setForm({ ...form } as Form);
+      const model = new Survey.Model(form.model);
+      setModel(model);
+      const item = getItemByResult(result);
+      if (item) {
+        model.data = JSON.parse(item.content);
+        setID(item.id);
+        setCreatedAt(parseISO(item.createdAt));
+        if (item.updatedAt) {
+          setUpdatedAt(parseISO(item.updatedAt));
+        }
+      }
+    }
+  };
+
+  const fetchFormAndItem = async () => {
     const user = await Auth.currentAuthenticatedUser({ bypassCache: false });
     const username = user.username;
     const query = `
@@ -128,23 +147,25 @@ const SurveyInput = () => {
     )) as GraphQLResult<ListSurveyFormsQuery>;
 
     console.log("fetch reslt", { inputKey, username, result });
+    return result;
+  };
 
+  const getFormByResult = (
+    result: GraphQLResult<ListSurveyFormsQuery>
+  ): Form | undefined => {
     const items = result.data?.listSurveyForms?.items;
     if (items && items.length > 0 && items[0]) {
-      const form = items[0];
-      setForm({ ...form } as Form);
-      const model = new Survey.Model(form.model);
+      return items[0] as Form;
+    }
+  };
+
+  const getItemByResult = (result: GraphQLResult<ListSurveyFormsQuery>) => {
+    const form = getFormByResult(result);
+    if (form) {
       const datas: any[] | null = (form as any).results?.items;
       if (datas && datas.length > 0 && datas[0]) {
-        const item = datas[0];
-        model.data = JSON.parse(item.content);
-        setID(item.id);
-        setCreatedAt(parseISO(item.createdAt));
-        if (item.updatedAt) {
-          setUpdatedAt(parseISO(item.updatedAt));
-        }
+        return datas[0];
       }
-      setModel(model);
     }
   };
 
@@ -164,20 +185,30 @@ const SurveyInput = () => {
         console.log("error updateing input:", err);
       }
     } else {
-      const user = await Auth.currentAuthenticatedUser({ bypassCache: false });
-      const createdBy = user.username;
-      const input: Input = {
-        createdBy,
-        content: JSON.stringify(survey.data),
-        formID: form?.id,
-      };
-      try {
-        const result = await API.graphql(
-          graphqlOperation(createSurveyInput, { input })
-        );
-        console.log(result);
-      } catch (err) {
-        console.log("error creating todo:", err);
+      // Check for existence before create.
+      const result = await fetchFormAndItem();
+      const item = getItemByResult(result);
+      console.log(item);
+      if (!item) {
+        const user = await Auth.currentAuthenticatedUser({
+          bypassCache: false,
+        });
+        const createdBy = user.username;
+        const input: Input = {
+          createdBy,
+          content: JSON.stringify(survey.data),
+          formID: form?.id,
+        };
+        try {
+          const result = await API.graphql(
+            graphqlOperation(createSurveyInput, { input })
+          );
+          console.log(result);
+        } catch (err) {
+          console.log("error creating todo:", err);
+        }
+      } else {
+        console.log("input data exists.");
       }
     }
     setTimeout(() => {
