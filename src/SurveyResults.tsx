@@ -157,7 +157,7 @@ const SurveyResults = () => {
     <div>
       <h2>Results</h2>
       <div>{form?.name}</div>
-      <div>{form?.description}</div>
+      <div style={{whiteSpace: 'pre-line'}}>{form?.description}</div>
       <div>
         <Button
           variant="contained"

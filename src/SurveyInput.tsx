@@ -264,7 +264,7 @@ const SurveyInput = () => {
         <Typography variant="h5" align="center" component="h1" gutterBottom>
           {form.name}
         </Typography>
-        <Typography paragraph align="center" gutterBottom>
+        <Typography paragraph align="center" gutterBottom style={{whiteSpace: 'pre-line'}}>
           {form.description}
         </Typography>
         <Survey.Survey
