@@ -36,12 +36,12 @@ import * as Survey from "survey-react";
 import $ from "jquery";
 import "select2";
 import "select2/dist/css/select2.min.css";
-import * as widgets from "surveyjs-widgets";
 import select2widgets from "./select2widget";
+import select2TagboxWidget from "./select2TagboxWidget";
 
 window["$"] = window["jQuery"] = $;
 select2widgets(Survey, $);
-widgets.select2tagbox(Survey);
+select2TagboxWidget(Survey, $);
 
 const useStyles = makeStyles((theme) => ({
   list: {

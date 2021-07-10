@@ -160,7 +160,12 @@ const template: StringKeyObject = {
   },
   tagbox: {
     isRequired: true,
-    choices: ["None", "Nissan", "BMW", "Toyota"],
+    choices2: [
+      "None",
+      { value: "Nissan", group: "Japan" },
+      { value: "BMW", group: "others" },
+      { value: "Toyota", group: "Japan" },
+    ],
   },
   checkbox: {
     isRequired: true,
@@ -594,7 +599,12 @@ const SurveyForm = () => {
           <Typography variant="h5" align="center" component="h1" gutterBottom>
             {formState.name}
           </Typography>
-          <Typography paragraph align="center" gutterBottom style={{whiteSpace: 'pre-line'}}>
+          <Typography
+            paragraph
+            align="center"
+            gutterBottom
+            style={{ whiteSpace: "pre-line" }}
+          >
             {formState.description}
           </Typography>
           <Survey.Survey json={formState.model ?? "{}"} mode="display" />

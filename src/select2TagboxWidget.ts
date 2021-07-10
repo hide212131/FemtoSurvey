@@ -1,7 +1,18 @@
 /* eslint-disable eqeqeq */
 import * as Survey from "survey-react";
 
-function init(Survey, $) {
+type Choice2 = { value: string; group: string } | string;
+interface Select2Item {
+  id: string;
+  text: string;
+}
+interface Select2Group {
+  text: string;
+  children: Select2Item[];
+}
+type Select2Data = Select2Group | Select2Item;
+
+function init(Survey: any, $: any | undefined) {
   $ = $ || window.$;
   var widget = {
     name: "tagbox",
@@ -15,10 +26,10 @@ function init(Survey, $) {
     },
     htmlTemplate:
       "<div><select multiple='multiple' style='width: 100%;'></select><textarea></textarea></div>",
-    isFit: function (question) {
+    isFit: function (question: Survey.Question) {
       return question.getType() === "tagbox";
     },
-    activatedByChanged: function (activatedBy) {
+    activatedByChanged: function (activatedBy: string) {
       Survey.JsonObject.metaData.addClass(
         "tagbox",
         [
@@ -38,6 +49,11 @@ function init(Survey, $) {
         default: null,
       });
       Survey.JsonObject.metaData.addProperty("tagbox", {
+        name: "choices2",
+        category: "general",
+        default: null,
+      });
+      Survey.JsonObject.metaData.addProperty("tagbox", {
         name: "placeholder",
         category: "general",
         default: "",
@@ -50,6 +66,7 @@ function init(Survey, $) {
       Survey.matrixDropdownColumnTypes.tagbox = {
         properties: [
           "choices",
+          "choices2",
           "choicesOrder",
           "choicesByUrl",
           "optionsCaption",
@@ -58,11 +75,11 @@ function init(Survey, $) {
         ],
       };
     },
-    fixStyles: function (el) {
+    fixStyles: function (el: any) {
       el.parentElement.querySelector(".select2-search__field").style.border =
         "none";
     },
-    afterRender: function (question, el) {
+    afterRender: function (question: any, el: any) {
       var self = this;
       var select2Config = question.select2Config;
       var settings =
@@ -106,7 +123,7 @@ function init(Survey, $) {
       };
 
       self.fixStyles(el);
-      var question;
+      // var question: any;
       var updateValueHandler = function () {
         if (question.hasSelectAll && question.isAllSelected) {
           $el
@@ -123,17 +140,48 @@ function init(Survey, $) {
         if (settings.ajax) {
           $el.select2(settings);
         } else {
-          settings.data = question.visibleChoices.map(function (choice) {
-            return {
-              id: choice.value,
-              text: choice.text,
-            };
-          });
+          const data: Select2Data[] = [];
+          const choices: string[] = [];
+          if (question.choices2) {
+            const choices2: Choice2[] = question.choices2 as Choice2[];
+            choices2.forEach((choice) => {
+              if (typeof choice === "string") {
+                const item: Select2Item = {
+                  id: choice,
+                  text: choice,
+                };
+                data.push(item);
+                choices.push(item.id);
+              } else {
+                if (choice.group) {
+                  const item: Select2Item = {
+                    id: choice.value,
+                    text: choice.value,
+                  };
+
+                  let group = data.find(
+                    (d) => d.text === choice.group && "children" in d
+                  ) as Select2Group;
+                  if (!group) {
+                    group = {
+                      text: choice.group,
+                      children: [],
+                    };
+                    data.push(group);
+                  }
+                  group.children.push(item);
+                  choices.push(item.id);
+                }
+              }
+            });
+          }
+          settings.data = data;
           $el.select2(settings);
+          question.choices = choices;
         }
         updateValueHandler();
       };
-      var isAllItemSelected = function (value) {
+      var isAllItemSelected = function (value: any) {
         return (
           question.hasSelectAll && value === question.selectAllItemValue.value
         );
@@ -152,7 +200,7 @@ function init(Survey, $) {
         question._propertyValueChangedFnSelect2
       );
       question.valueChangedCallback = updateValueHandler;
-      $el.on("select2:select", function (e) {
+      $el.on("select2:select", function (e: any) {
         if (isAllItemSelected(e.params.data.id)) {
           question.selectAll();
         } else {
@@ -160,7 +208,7 @@ function init(Survey, $) {
         }
         updateComment();
       });
-      $el.on("select2:unselect", function (e) {
+      $el.on("select2:unselect", function (e: any) {
         var index = (question.value || []).indexOf(e.params.data.id);
         if (isAllItemSelected(e.params.data.id)) {
           question.clearValue();
@@ -173,7 +221,7 @@ function init(Survey, $) {
       });
       updateChoices();
     },
-    willUnmount: function (question, el) {
+    willUnmount: function (question: any, el: any) {
       if (!question._propertyValueChangedFnSelect2) return;
 
       var $select2 = $(el).find("select");
