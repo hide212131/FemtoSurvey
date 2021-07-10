@@ -37,11 +37,11 @@ import $ from "jquery";
 import "select2";
 import "select2/dist/css/select2.min.css";
 import * as widgets from "surveyjs-widgets";
+import select2widgets from "./select2widget";
 
 window["$"] = window["jQuery"] = $;
-widgets.select2(Survey);
+select2widgets(Survey, $);
 widgets.select2tagbox(Survey);
-
 
 const useStyles = makeStyles((theme) => ({
   list: {

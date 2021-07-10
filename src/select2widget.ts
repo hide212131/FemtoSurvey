@@ -1,6 +1,18 @@
+/* eslint-disable eqeqeq */
 import * as Survey from "survey-react";
 
-function init(Survey, $) {
+type Choice2 = { value: string; group: string } | string;
+interface Select2Item {
+  id: string;
+  text: string;
+}
+interface Select2Group {
+  text: string;
+  children: Select2Item[];
+}
+type Select2Data = Select2Group | Select2Item;
+
+function init(Survey: any, $: any | undefined) {
   $ = $ || window.$;
   var widget = {
     activatedBy: "property",
@@ -8,7 +20,7 @@ function init(Survey, $) {
     widgetIsLoaded: function () {
       return typeof $ == "function" && !!$.fn.select2;
     },
-    isFit: function (question) {
+    isFit: function (question: Survey.Question) {
       if (widget.activatedBy == "property")
         return (
           question["renderAs"] === "select2" &&
@@ -20,7 +32,7 @@ function init(Survey, $) {
         return question.getType() === "select2";
       return false;
     },
-    activatedByChanged: function (activatedBy) {
+    activatedByChanged: function (activatedBy: string) {
       if (!this.widgetIsLoaded()) return;
       widget.activatedBy = activatedBy;
       Survey.JsonObject.metaData.removeProperty("dropdown", "renderAs");
@@ -35,7 +47,15 @@ function init(Survey, $) {
           dependsOn: "renderAs",
           category: "general",
           name: "select2Config",
-          visibleIf: function (obj) {
+          visibleIf: function (obj: any) {
+            return obj.renderAs == "select2";
+          },
+        });
+        Survey.JsonObject.metaData.addProperty("dropdown", {
+          dependsOn: "renderAs",
+          category: "general",
+          name: "choices2",
+          visibleIf: function (obj: any) {
             return obj.renderAs == "select2";
           },
         });
@@ -47,11 +67,16 @@ function init(Survey, $) {
           category: "general",
           default: null,
         });
+        Survey.JsonObject.metaData.addProperty("select2", {
+          name: "choices2",
+          category: "general",
+          default: null,
+        });
       }
     },
     htmlTemplate:
       "<div><select style='width: 100%;'></select><textarea></textarea></div>",
-    afterRender: function (question, el) {
+    afterRender: function (question: Survey.Question, el: any) {
       var select2Config = question.select2Config;
       var settings =
         select2Config && typeof select2Config == "string"
@@ -78,7 +103,7 @@ function init(Survey, $) {
       var updateValueHandler = function () {
         if (isSettingValue) return;
         isSettingValue = true;
-        if ($el.find('option[value="' + (question.value || "") + '"]').length) {
+        if ($el.find("option[value='" + (question.value || "") + "']").length) {
           $el.val(question.value).trigger("change");
         } else {
           if (question.value !== null && question.value !== undefined) {
@@ -108,20 +133,48 @@ function init(Survey, $) {
           $el.select2(settings);
           question.keepIncorrectValues = true;
         } else {
-          var data = [];
+          const data: Select2Data[] = [];
           if (!!settings.placeholder || question.showOptionsCaption) {
             data.push({ id: "", text: "" });
           }
-          settings.data = data.concat(
-            question.visibleChoices.map(function (choice) {
-              return {
-                id: choice.value,
-                text: choice.text,
+
+          const choices: string[] = [];
+          const choices2: Choice2[] = question.choices2 as Choice2[];
+          choices2.forEach((choice) => {
+            if (typeof choice === "string") {
+              const item: Select2Item = {
+                id: choice,
+                text: choice,
               };
-            })
-          );
+              data.push(item);
+              choices.push(item.id);
+            } else {
+              if (choice.group) {
+                const item: Select2Item = {
+                  id: choice.value,
+                  text: choice.value,
+                };
+
+                let group = data.find(
+                  (d) => d.text === choice.group && "children" in d
+                ) as Select2Group;
+                if (!group) {
+                  group = {
+                    text: choice.group,
+                    children: [],
+                  };
+                  data.push(group);
+                }
+                group.children.push(item);
+                choices.push(item.id);
+              }
+            }
+          });
+
+          settings.data = data;
           question.clearIncorrectValues();
           $el.select2(settings);
+          question.choices = choices;
         }
         // fixed width accrording to https://stackoverflow.com/questions/45276778/select2-not-responsive-width-larger-than-container
         if (!!el.querySelector(".select2")) {
@@ -146,25 +199,25 @@ function init(Survey, $) {
         }
       );
       updateChoices();
-      $el.on("change", function (e) {
+      $el.on("change", function (e: any) {
         setTimeout(function () {
           question.renderedValue = e.target.value;
           updateComment();
         }, 1);
       });
-      $el.on("select2:select", function (e) {
+      $el.on("select2:select", function (e: any) {
         setTimeout(function () {
           question.renderedValue = e.target.value;
           updateComment();
         }, 1);
       });
-      $el.on("select2:opening", function (e) {
+      $el.on("select2:opening", (e: any) => {
         if ($(this).data("unselecting")) {
           $(this).removeData("unselecting");
           e.preventDefault();
         }
       });
-      $el.on("select2:unselecting", function (e) {
+      $el.on("select2:unselecting", (e: any) => {
         $(this).data("unselecting", true);
         setTimeout(function () {
           question.renderedValue = null;
@@ -174,7 +227,7 @@ function init(Survey, $) {
       question.valueChangedCallback = updateValueHandler;
       updateValueHandler();
     },
-    willUnmount: function (question, el) {
+    willUnmount: function (question: any, el: any) {
       question.readOnlyChangedCallback = null;
       question.valueChangedCallback = null;
       var $select2 = $(el).find("select");

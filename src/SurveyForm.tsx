@@ -151,7 +151,12 @@ const template: StringKeyObject = {
   select2: {
     renderAs: "select2",
     isRequired: true,
-    choices: ["None", "Nissan", "BMW", "Toyota"],
+    choices2: [
+      "None",
+      { value: "Nissan", group: "Japan" },
+      { value: "BMW", group: "others" },
+      { value: "Toyota", group: "Japan" },
+    ],
   },
   tagbox: {
     isRequired: true,
