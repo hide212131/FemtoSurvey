@@ -32,6 +32,7 @@ import {
   TableHead,
   TableRow,
   TableCell,
+  Box,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
@@ -527,23 +528,32 @@ const SurveyForm = () => {
                         </IconButton>
                       </TableCell>
                     </TableRow>
-                    <Collapse
-                      in={editorOpen === index}
-                      timeout="auto"
-                      unmountOnExit
-                    >
-                      <TextField
-                        required
-                        id={"editor" + index}
-                        name={"editor" + index}
-                        label={"editor" + index}
-                        fullWidth
-                        multiline
-                        rows={10}
-                        value={comp.content}
-                        onChange={(e) => onTextChange(e, index)}
-                      />
-                    </Collapse>
+                    <TableRow>
+                      <TableCell
+                        style={{ paddingBottom: 0, paddingTop: 0 }}
+                        colSpan={5}
+                      >
+                        <Collapse
+                          in={editorOpen === index}
+                          timeout="auto"
+                          unmountOnExit
+                        >
+                          <Box margin={1}>
+                            <TextField
+                              required
+                              id={"editor" + index}
+                              name={"editor" + index}
+                              label={"editor" + index}
+                              fullWidth
+                              multiline
+                              rows={10}
+                              value={comp.content}
+                              onChange={(e) => onTextChange(e, index)}
+                            />
+                          </Box>
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
                   </React.Fragment>
                 );
               })}
