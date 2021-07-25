@@ -139,37 +139,39 @@ function init(Survey: any, $: any | undefined) {
           }
 
           const choices: string[] = [];
-          const choices2: Choice2[] = question.choices2 as Choice2[];
-          choices2.forEach((choice) => {
-            if (typeof choice === "string") {
-              const item: Select2Item = {
-                id: choice,
-                text: choice,
-              };
-              data.push(item);
-              choices.push(item.id);
-            } else {
-              if (choice.group) {
+          if (question.choices2) {
+            const choices2: Choice2[] = question.choices2 as Choice2[];          
+            choices2.forEach((choice) => {
+              if (typeof choice === "string") {
                 const item: Select2Item = {
-                  id: choice.value,
-                  text: choice.value,
+                  id: choice,
+                  text: choice,
                 };
-
-                let group = data.find(
-                  (d) => d.text === choice.group && "children" in d
-                ) as Select2Group;
-                if (!group) {
-                  group = {
-                    text: choice.group,
-                    children: [],
-                  };
-                  data.push(group);
-                }
-                group.children.push(item);
+                data.push(item);
                 choices.push(item.id);
+              } else {
+                if (choice.group) {
+                  const item: Select2Item = {
+                    id: choice.value,
+                    text: choice.value,
+                  };
+
+                  let group = data.find(
+                    (d) => d.text === choice.group && "children" in d
+                  ) as Select2Group;
+                  if (!group) {
+                    group = {
+                      text: choice.group,
+                      children: [],
+                    };
+                    data.push(group);
+                  }
+                  group.children.push(item);
+                  choices.push(item.id);
+                }
               }
-            }
-          });
+            });
+          }
 
           settings.data = data;
           question.clearIncorrectValues();
