@@ -41,6 +41,13 @@ import CloseIcon from "@material-ui/icons/Close";
 import { Link, useParams } from "react-router-dom";
 import { getSurveyForm } from "./graphql/queries";
 import { GetSurveyFormQuery } from "./API";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
+
 //Define Survey JSON
 //Here is the simplest Survey with one text question
 const useStyles = makeStyles((theme) => ({
@@ -191,6 +198,34 @@ const compKeySelect: Array<{ key: string; type: string; value: string }> = [
   { key: "spreadsheet", type: "spreadsheet", value: "Spreadsheet" },
 ];
 
+// Reference
+// https://github.com/hmarggraff/react-material-ui-table-row-drag-and-drop
+
+// a little function to help us with reordering the result
+const reorder = (list: Component[], startIndex: number, endIndex: number) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
+const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
+  // some basic styles to make the items look a bit nicer
+  userSelect: "none",
+  padding: 5,
+
+  // change background colour if dragging
+  background: isDragging ? "lightgrey" : "white",
+
+  // styles we need to apply on draggables
+  ...draggableStyle,
+});
+
+const getListStyle = (isDraggingOver: boolean) => ({
+  background: isDraggingOver ? "lightblue" : "white",
+});
+
 const SurveyForm = () => {
   const classes = useStyles();
   console.log("SurveyModel start");
@@ -304,7 +339,8 @@ const SurveyForm = () => {
       const model: any = JSON.parse(content);
       const title = model.title as string;
       const type = model.type as string;
-      return { content, type, title } as Component;
+      const name = model.name as string;
+      return { content, type, title, name } as Component;
     } catch (e) {}
   };
 
@@ -361,6 +397,128 @@ const SurveyForm = () => {
   const handleClose = () => {
     setMessage(null);
   };
+
+  const onDragEnd = (result: DropResult) => {
+    console.log(result, componentList);
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const items = reorder(
+      componentList,
+      result.source.index,
+      result.destination.index
+    );
+
+    updateModel(items);
+  };
+
+  const createFormEditRow = () => (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId="droppable">
+        {(provided, snapshot) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            style={getListStyle(snapshot.isDraggingOver)}
+          >
+            {componentList.map((comp, index) => (
+              <React.Fragment>
+                <Draggable
+                  key={comp.name}
+                  draggableId={comp.name}
+                  index={index}
+                >
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={getItemStyle(
+                        snapshot.isDragging,
+                        provided.draggableProps.style
+                      )}
+                    >
+                      <Paper
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "30px 1fr 64px 64px",
+                          gridTemplateRows: "64px",
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gridColumn: 1,
+                          }}
+                        >
+                          {index + 1}
+                        </span>
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gridColumn: 2,
+                          }}
+                        >
+                          {comp.title}
+                        </span>
+                        <IconButton
+                          style={{ gridColumn: 3 }}
+                          aria-label="edit"
+                          onClick={() =>
+                            setEditorOpen(editorOpen === index ? null : index)
+                          }
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          style={{ gridColumn: 4 }}
+                          aria-label="delete"
+                          onClick={() =>
+                            updateModel(
+                              componentList.filter((c, i) => i !== index)
+                            )
+                          }
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Paper>
+                      <Collapse
+                        in={editorOpen === index}
+                        timeout="auto"
+                        unmountOnExit
+                      >
+                        <Box margin={1}>
+                          <TextField
+                            required
+                            id={"editor" + index}
+                            name={"editor" + index}
+                            label={"editor" + index}
+                            fullWidth
+                            multiline
+                            rows={10}
+                            value={comp.content}
+                            onChange={(e) => onTextChange(e, index)}
+                          />
+                        </Box>
+                      </Collapse>
+                    </div>
+                  )}
+                </Draggable>
+              </React.Fragment>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+
+  console.log(componentList);
 
   return (
     <React.Fragment>
@@ -497,68 +655,11 @@ const SurveyForm = () => {
                 </TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {componentList.map((comp, index) => {
-                return (
-                  <React.Fragment>
-                    <TableRow>
-                      <TableCell colSpan={2}>{`${index + 1}.${
-                        comp.title
-                      }`}</TableCell>
-                      <TableCell>
-                        <IconButton
-                          edge="end"
-                          aria-label="edit"
-                          onClick={() =>
-                            setEditorOpen(editorOpen === index ? null : index)
-                          }
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          edge="end"
-                          aria-label="delete"
-                          onClick={() =>
-                            updateModel(
-                              componentList.filter((c, i) => i !== index)
-                            )
-                          }
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell
-                        style={{ paddingBottom: 0, paddingTop: 0 }}
-                        colSpan={5}
-                      >
-                        <Collapse
-                          in={editorOpen === index}
-                          timeout="auto"
-                          unmountOnExit
-                        >
-                          <Box margin={1}>
-                            <TextField
-                              required
-                              id={"editor" + index}
-                              name={"editor" + index}
-                              label={"editor" + index}
-                              fullWidth
-                              multiline
-                              rows={10}
-                              value={comp.content}
-                              onChange={(e) => onTextChange(e, index)}
-                            />
-                          </Box>
-                        </Collapse>
-                      </TableCell>
-                    </TableRow>
-                  </React.Fragment>
-                );
-              })}
-            </TableBody>
+            <TableBody></TableBody>
           </Table>
+
+          {createFormEditRow()}
+
           <div className={classes.buttons}>
             <Button
               variant="contained"
