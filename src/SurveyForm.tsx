@@ -5,7 +5,7 @@ import "./spreadsheetwidget";
 import "jsuites/dist/jsuites.css";
 import "jspreadsheet-ce/dist/jspreadsheet.css";
 import "jspreadsheet-ce/dist/jspreadsheet.theme.css";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { API, Auth, graphqlOperation } from "aws-amplify";
 import { GraphQLResult } from "@aws-amplify/api-graphql";
 import { createSurveyForm, updateSurveyForm } from "./graphql/mutations";
@@ -23,7 +23,6 @@ import {
   Tooltip,
   InputLabel,
   Collapse,
-  Button,
   CircularProgress,
   Backdrop,
   Snackbar,
@@ -47,6 +46,8 @@ import {
   Draggable,
   DropResult,
 } from "react-beautiful-dnd";
+import { useDropzone } from "react-dropzone";
+import SplitButton from "./utils/SplitButton";
 
 //Define Survey JSON
 //Here is the simplest Survey with one text question
@@ -263,23 +264,42 @@ const SurveyForm = () => {
     console.log("fetch reslt", { formID, result });
     const form = result.data?.getSurveyForm;
     if (form) {
-      const componentList = (JSON.parse(form.model).elements as []).map(
-        (el) =>
-          createComponent(JSON.stringify(el, null, "  ")) ??
-          ({
-            type: "?",
-            title: "?",
-            name: "?",
-            content: JSON.stringify(el),
-          } as Component)
+      const componentList = modelToComponentList(
+        JSON.parse(form.model).elements as []
       );
       updateModel(componentList);
       setFormState({ ...form } as Form);
     }
   };
 
+  const modelToComponentList = (model: []) =>
+    model.map(
+      (el) =>
+        createComponent(JSON.stringify(el, null, "  ")) ??
+        ({
+          type: "?",
+          title: "?",
+          name: "?",
+          content: JSON.stringify(el),
+        } as Component)
+    );
+
   const setInput = (key: string, value: string | null) => {
     setFormState({ ...formState, [key]: value });
+  };
+
+  const handleButtonClick = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    index: number
+  ) => {
+    switch (index) {
+      case 0:
+        createSurvey();
+        break;
+      case 1:
+        exportForm();
+        break;
+    }
   };
 
   const createSurvey = async () => {
@@ -414,6 +434,77 @@ const SurveyForm = () => {
     updateModel(items);
   };
 
+  // yaml file drag & drop
+  const {
+    acceptedFiles,
+    getRootProps,
+    isDragActive,
+    isDragAccept,
+    isDragReject,
+  } = useDropzone({ accept: "application/json" });
+
+  const fileDragStyle = useMemo(
+    () => ({
+      ...(isDragActive
+        ? {
+            background: "lightgray",
+          }
+        : {}),
+      ...(isDragAccept
+        ? {
+            background: "lightgray",
+          }
+        : {}),
+      ...(isDragReject
+        ? {
+            background: "#ff1744",
+          }
+        : {}),
+    }),
+    [isDragActive, isDragAccept, isDragReject]
+  );
+
+  useEffect(() => {
+    if (acceptedFiles.length > 0) {
+      const file = acceptedFiles[0];
+      const reader = new FileReader();
+      reader.onload = (ev: ProgressEvent<FileReader>) => {
+        if (reader.result) {
+          const data = JSON.parse(reader.result as string);
+          const name = data["name"];
+          const description = data["description"];
+          const model = JSON.stringify(data.model);
+          const elements: [] = JSON.parse(model).elements;
+          console.log(elements);
+          const componentList = modelToComponentList(elements);
+          updateModel(componentList);
+          setFormState({ ...formState, name, description, model });
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [acceptedFiles]);
+
+  // export form
+  const exportForm = async () => {
+    const data = {
+      name: formState.name,
+      description: formState.description,
+      model: formState.model ? JSON.parse(formState.model) : null,
+    };
+    const fileName = data.name;
+    const json = JSON.stringify(data, null, "  ");
+    const blob = new Blob([json], { type: "application/json" });
+    const href = await URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = href;
+    link.download = fileName + ".json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const createFormEditRow = () => (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="droppable">
@@ -518,8 +609,6 @@ const SurveyForm = () => {
     </DragDropContext>
   );
 
-  console.log(componentList);
-
   return (
     <React.Fragment>
       <div className={classes.header}>
@@ -584,7 +673,10 @@ const SurveyForm = () => {
         ) : (
           <React.Fragment></React.Fragment>
         )}
-        <Paper className={classes.paper}>
+        <Paper
+          className={classes.paper}
+          {...getRootProps({ style: fileDragStyle })}
+        >
           <Typography variant="h6" gutterBottom>
             {formID ? "Exists" : "New"} survey form
           </Typography>
@@ -661,7 +753,7 @@ const SurveyForm = () => {
           {createFormEditRow()}
 
           <div className={classes.buttons}>
-            <Button
+            <SplitButton
               variant="contained"
               color="primary"
               className={classes.button}
@@ -672,10 +764,10 @@ const SurveyForm = () => {
                 !formState.description ||
                 !formState.model
               }
-              onClick={createSurvey}
+              onClick={handleButtonClick}
             >
-              {formID ? "update" : "create"} survey
-            </Button>
+              {[`${formID ? "Update" : "Create"} Survey`, "Export Form"]}
+            </SplitButton>
             <Backdrop className={classes.backdrop} open={loading}>
               <CircularProgress color="inherit" />
             </Backdrop>
