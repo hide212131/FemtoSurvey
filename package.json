@@ -37,6 +37,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "amplify:editFormAndInputs": "cd amplify/backend/function/editFormAndInputs/src/lib && npx tsc && cd -",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

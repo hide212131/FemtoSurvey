@@ -12,11 +12,11 @@ export const getSurveyForm = /* GraphQL */ `
       createdBy
       inputKey
       resultKey
+      createdAt
+      updatedAt
       results {
         nextToken
       }
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -48,6 +48,9 @@ export const getSurveyInput = /* GraphQL */ `
       id
       formID
       createdBy
+      content
+      createdAt
+      updatedAt
       form {
         id
         name
@@ -59,9 +62,6 @@ export const getSurveyInput = /* GraphQL */ `
         createdAt
         updatedAt
       }
-      content
-      createdAt
-      updatedAt
     }
   }
 `;

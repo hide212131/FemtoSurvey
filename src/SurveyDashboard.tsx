@@ -29,7 +29,7 @@ import {
   DialogTitle,
   TextField,
 } from "@material-ui/core";
-import { deleteSurveyForm } from "./graphql/mutations";
+import { deleteFormAndInputs } from "./graphql/mutations";
 import Delete from "@material-ui/icons/Delete";
 //Define Survey JSON
 //Here is the simplest Survey with one text question
@@ -185,13 +185,7 @@ const SurveyDashboard = () => {
     try {
       setLoading(true);
       if (formID) {
-        const input = {
-          id: formID,
-        };
-
-        // await API.graphql(graphqlOperation(deleteSurveyForm, { input }));
-
-        
+        await API.graphql(graphqlOperation(deleteFormAndInputs, { formID }));
         window.location.reload();
       }
       setMessage("success");

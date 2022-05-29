@@ -1,0 +1,5 @@
+{
+  "apiGraphQLAPIIdOutput": {
+    "Fn::GetAtt": ["apisurvey", "Outputs.GraphQLAPIIdOutput"]
+  }
+}

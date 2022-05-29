@@ -43,4 +43,7 @@ amplifytools.xcconfig
 .secret-*
 amplify/team-provider-info.json
 amplify/backend/function/itemsLambda/.env
+amplify/backend/function/editFormAndInputs/.env
 amplify/backend/api/survey/resolvers/*.vtl
+amplify/backend/function/editFormAndInputs/src/**/*.js
+tmp
