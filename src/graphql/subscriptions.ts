@@ -12,11 +12,11 @@ export const onCreateSurveyForm = /* GraphQL */ `
       createdBy
       inputKey
       resultKey
+      createdAt
+      updatedAt
       results {
         nextToken
       }
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -30,11 +30,11 @@ export const onUpdateSurveyForm = /* GraphQL */ `
       createdBy
       inputKey
       resultKey
+      createdAt
+      updatedAt
       results {
         nextToken
       }
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -48,11 +48,11 @@ export const onDeleteSurveyForm = /* GraphQL */ `
       createdBy
       inputKey
       resultKey
+      createdAt
+      updatedAt
       results {
         nextToken
       }
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -62,6 +62,9 @@ export const onCreateSurveyInput = /* GraphQL */ `
       id
       formID
       createdBy
+      content
+      createdAt
+      updatedAt
       form {
         id
         name
@@ -73,9 +76,6 @@ export const onCreateSurveyInput = /* GraphQL */ `
         createdAt
         updatedAt
       }
-      content
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -85,6 +85,9 @@ export const onUpdateSurveyInput = /* GraphQL */ `
       id
       formID
       createdBy
+      content
+      createdAt
+      updatedAt
       form {
         id
         name
@@ -96,9 +99,6 @@ export const onUpdateSurveyInput = /* GraphQL */ `
         createdAt
         updatedAt
       }
-      content
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -108,6 +108,9 @@ export const onDeleteSurveyInput = /* GraphQL */ `
       id
       formID
       createdBy
+      content
+      createdAt
+      updatedAt
       form {
         id
         name
@@ -119,9 +122,6 @@ export const onDeleteSurveyInput = /* GraphQL */ `
         createdAt
         updatedAt
       }
-      content
-      createdAt
-      updatedAt
     }
   }
 `;

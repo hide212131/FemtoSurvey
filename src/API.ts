@@ -2,6 +2,11 @@
 /* eslint-disable */
 //  This file was automatically generated and should not be edited.
 
+export type DeleteFormAndInputsResponse = {
+  __typename: "DeleteFormAndInputsResponse",
+  id: string,
+};
+
 export type CreateSurveyFormInput = {
   id?: string | null,
   name: string,
@@ -66,33 +71,33 @@ export type ModelSizeInput = {
 
 export type SurveyForm = {
   __typename: "SurveyForm",
-  id?: string,
-  name?: string,
+  id: string,
+  name: string,
   description?: string | null,
-  model?: string,
-  createdBy?: string,
-  inputKey?: string,
-  resultKey?: string,
-  results?: ModelSurveyInputConnection,
-  createdAt?: string,
-  updatedAt?: string,
+  model: string,
+  createdBy: string,
+  inputKey: string,
+  resultKey: string,
+  createdAt: string,
+  updatedAt: string,
+  results?: ModelSurveyInputConnection | null,
 };
 
 export type ModelSurveyInputConnection = {
   __typename: "ModelSurveyInputConnection",
-  items?:  Array<SurveyInput | null > | null,
+  items:  Array<SurveyInput | null >,
   nextToken?: string | null,
 };
 
 export type SurveyInput = {
   __typename: "SurveyInput",
-  id?: string,
-  formID?: string,
-  createdBy?: string,
-  form?: SurveyForm,
-  content?: string,
-  createdAt?: string,
-  updatedAt?: string,
+  id: string,
+  formID: string,
+  createdBy: string,
+  content: string,
+  createdAt: string,
+  updatedAt: string,
+  form?: SurveyForm | null,
 };
 
 export type UpdateSurveyFormInput = {
@@ -106,7 +111,7 @@ export type UpdateSurveyFormInput = {
 };
 
 export type DeleteSurveyFormInput = {
-  id?: string | null,
+  id: string,
 };
 
 export type CreateSurveyInputInput = {
@@ -149,7 +154,7 @@ export type UpdateSurveyInputInput = {
 };
 
 export type DeleteSurveyInputInput = {
-  id?: string | null,
+  id: string,
 };
 
 export type ModelSurveyFormFilterInput = {
@@ -167,7 +172,7 @@ export type ModelSurveyFormFilterInput = {
 
 export type ModelSurveyFormConnection = {
   __typename: "ModelSurveyFormConnection",
-  items?:  Array<SurveyForm | null > | null,
+  items:  Array<SurveyForm | null >,
   nextToken?: string | null,
 };
 
@@ -181,8 +186,19 @@ export type ModelSurveyInputFilterInput = {
   not?: ModelSurveyInputFilterInput | null,
 };
 
+export type DeleteFormAndInputsMutationVariables = {
+  formID?: string | null,
+};
+
+export type DeleteFormAndInputsMutation = {
+  deleteFormAndInputs?:  {
+    __typename: "DeleteFormAndInputsResponse",
+    id: string,
+  } | null,
+};
+
 export type CreateSurveyFormMutationVariables = {
-  input?: CreateSurveyFormInput,
+  input: CreateSurveyFormInput,
   condition?: ModelSurveyFormConditionInput | null,
 };
 
@@ -196,17 +212,17 @@ export type CreateSurveyFormMutation = {
     createdBy: string,
     inputKey: string,
     resultKey: string,
+    createdAt: string,
+    updatedAt: string,
     results?:  {
       __typename: "ModelSurveyInputConnection",
       nextToken?: string | null,
     } | null,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
 export type UpdateSurveyFormMutationVariables = {
-  input?: UpdateSurveyFormInput,
+  input: UpdateSurveyFormInput,
   condition?: ModelSurveyFormConditionInput | null,
 };
 
@@ -220,17 +236,17 @@ export type UpdateSurveyFormMutation = {
     createdBy: string,
     inputKey: string,
     resultKey: string,
+    createdAt: string,
+    updatedAt: string,
     results?:  {
       __typename: "ModelSurveyInputConnection",
       nextToken?: string | null,
     } | null,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
 export type DeleteSurveyFormMutationVariables = {
-  input?: DeleteSurveyFormInput,
+  input: DeleteSurveyFormInput,
   condition?: ModelSurveyFormConditionInput | null,
 };
 
@@ -244,17 +260,17 @@ export type DeleteSurveyFormMutation = {
     createdBy: string,
     inputKey: string,
     resultKey: string,
+    createdAt: string,
+    updatedAt: string,
     results?:  {
       __typename: "ModelSurveyInputConnection",
       nextToken?: string | null,
     } | null,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
 export type CreateSurveyInputMutationVariables = {
-  input?: CreateSurveyInputInput,
+  input: CreateSurveyInputInput,
   condition?: ModelSurveyInputConditionInput | null,
 };
 
@@ -264,6 +280,9 @@ export type CreateSurveyInputMutation = {
     id: string,
     formID: string,
     createdBy: string,
+    content: string,
+    createdAt: string,
+    updatedAt: string,
     form?:  {
       __typename: "SurveyForm",
       id: string,
@@ -276,14 +295,11 @@ export type CreateSurveyInputMutation = {
       createdAt: string,
       updatedAt: string,
     } | null,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
 export type UpdateSurveyInputMutationVariables = {
-  input?: UpdateSurveyInputInput,
+  input: UpdateSurveyInputInput,
   condition?: ModelSurveyInputConditionInput | null,
 };
 
@@ -293,6 +309,9 @@ export type UpdateSurveyInputMutation = {
     id: string,
     formID: string,
     createdBy: string,
+    content: string,
+    createdAt: string,
+    updatedAt: string,
     form?:  {
       __typename: "SurveyForm",
       id: string,
@@ -305,14 +324,11 @@ export type UpdateSurveyInputMutation = {
       createdAt: string,
       updatedAt: string,
     } | null,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
 export type DeleteSurveyInputMutationVariables = {
-  input?: DeleteSurveyInputInput,
+  input: DeleteSurveyInputInput,
   condition?: ModelSurveyInputConditionInput | null,
 };
 
@@ -322,6 +338,9 @@ export type DeleteSurveyInputMutation = {
     id: string,
     formID: string,
     createdBy: string,
+    content: string,
+    createdAt: string,
+    updatedAt: string,
     form?:  {
       __typename: "SurveyForm",
       id: string,
@@ -334,14 +353,11 @@ export type DeleteSurveyInputMutation = {
       createdAt: string,
       updatedAt: string,
     } | null,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
 export type GetSurveyFormQueryVariables = {
-  id?: string,
+  id: string,
 };
 
 export type GetSurveyFormQuery = {
@@ -354,12 +370,12 @@ export type GetSurveyFormQuery = {
     createdBy: string,
     inputKey: string,
     resultKey: string,
+    createdAt: string,
+    updatedAt: string,
     results?:  {
       __typename: "ModelSurveyInputConnection",
       nextToken?: string | null,
     } | null,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
@@ -372,7 +388,7 @@ export type ListSurveyFormsQueryVariables = {
 export type ListSurveyFormsQuery = {
   listSurveyForms?:  {
     __typename: "ModelSurveyFormConnection",
-    items?:  Array< {
+    items:  Array< {
       __typename: "SurveyForm",
       id: string,
       name: string,
@@ -383,13 +399,13 @@ export type ListSurveyFormsQuery = {
       resultKey: string,
       createdAt: string,
       updatedAt: string,
-    } | null > | null,
+    } | null >,
     nextToken?: string | null,
   } | null,
 };
 
 export type GetSurveyInputQueryVariables = {
-  id?: string,
+  id: string,
 };
 
 export type GetSurveyInputQuery = {
@@ -398,6 +414,9 @@ export type GetSurveyInputQuery = {
     id: string,
     formID: string,
     createdBy: string,
+    content: string,
+    createdAt: string,
+    updatedAt: string,
     form?:  {
       __typename: "SurveyForm",
       id: string,
@@ -410,9 +429,6 @@ export type GetSurveyInputQuery = {
       createdAt: string,
       updatedAt: string,
     } | null,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
@@ -425,7 +441,7 @@ export type ListSurveyInputsQueryVariables = {
 export type ListSurveyInputsQuery = {
   listSurveyInputs?:  {
     __typename: "ModelSurveyInputConnection",
-    items?:  Array< {
+    items:  Array< {
       __typename: "SurveyInput",
       id: string,
       formID: string,
@@ -433,7 +449,7 @@ export type ListSurveyInputsQuery = {
       content: string,
       createdAt: string,
       updatedAt: string,
-    } | null > | null,
+    } | null >,
     nextToken?: string | null,
   } | null,
 };
@@ -448,12 +464,12 @@ export type OnCreateSurveyFormSubscription = {
     createdBy: string,
     inputKey: string,
     resultKey: string,
+    createdAt: string,
+    updatedAt: string,
     results?:  {
       __typename: "ModelSurveyInputConnection",
       nextToken?: string | null,
     } | null,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
@@ -467,12 +483,12 @@ export type OnUpdateSurveyFormSubscription = {
     createdBy: string,
     inputKey: string,
     resultKey: string,
+    createdAt: string,
+    updatedAt: string,
     results?:  {
       __typename: "ModelSurveyInputConnection",
       nextToken?: string | null,
     } | null,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
@@ -486,12 +502,12 @@ export type OnDeleteSurveyFormSubscription = {
     createdBy: string,
     inputKey: string,
     resultKey: string,
+    createdAt: string,
+    updatedAt: string,
     results?:  {
       __typename: "ModelSurveyInputConnection",
       nextToken?: string | null,
     } | null,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
@@ -501,6 +517,9 @@ export type OnCreateSurveyInputSubscription = {
     id: string,
     formID: string,
     createdBy: string,
+    content: string,
+    createdAt: string,
+    updatedAt: string,
     form?:  {
       __typename: "SurveyForm",
       id: string,
@@ -513,9 +532,6 @@ export type OnCreateSurveyInputSubscription = {
       createdAt: string,
       updatedAt: string,
     } | null,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
@@ -525,6 +541,9 @@ export type OnUpdateSurveyInputSubscription = {
     id: string,
     formID: string,
     createdBy: string,
+    content: string,
+    createdAt: string,
+    updatedAt: string,
     form?:  {
       __typename: "SurveyForm",
       id: string,
@@ -537,9 +556,6 @@ export type OnUpdateSurveyInputSubscription = {
       createdAt: string,
       updatedAt: string,
     } | null,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };
 
@@ -549,6 +565,9 @@ export type OnDeleteSurveyInputSubscription = {
     id: string,
     formID: string,
     createdBy: string,
+    content: string,
+    createdAt: string,
+    updatedAt: string,
     form?:  {
       __typename: "SurveyForm",
       id: string,
@@ -561,8 +580,5 @@ export type OnDeleteSurveyInputSubscription = {
       createdAt: string,
       updatedAt: string,
     } | null,
-    content: string,
-    createdAt: string,
-    updatedAt: string,
   } | null,
 };

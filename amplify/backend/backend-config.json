@@ -33,6 +33,9 @@
                 "apiKeyExpirationDays": 365,
                 "description": "itemsLambdaApiKey"
               }
+            },
+            {
+              "authenticationType": "AWS_IAM"
             }
           ]
         }
@@ -69,6 +72,11 @@
           ]
         }
       ]
+    },
+    "editFormAndInputs": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   }
 }

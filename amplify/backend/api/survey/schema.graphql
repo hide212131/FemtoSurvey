@@ -1,4 +1,10 @@
-type SurveyForm @model @aws_api_key @aws_cognito_user_pools {
+type SurveyForm @model 
+  @auth(rules: [
+    { allow: private, provider: userPools }
+    { allow: private, provider: iam }
+    { allow: public, provider: apiKey }
+  ])
+ {
   id: ID!
   name: String!
   description: String
@@ -12,11 +18,24 @@ type SurveyForm @model @aws_api_key @aws_cognito_user_pools {
 type SurveyInput
   @model
   @key(name: "byForm", fields: ["formID"])
-  @aws_api_key
-  @aws_cognito_user_pools {
+  @auth(rules: [
+    { allow: private, provider: userPools }
+    { allow: private, provider: iam }
+    { allow: public, provider: apiKey }
+  ])
+{
   id: ID!
   formID: ID!
   createdBy: String!
   form: SurveyForm @connection(fields: ["formID"])
   content: String!
+}
+
+type Mutation {
+    # Add all the custom mutations here
+    deleteFormAndInputs(formID: ID): DeleteFormAndInputsResponse @function(name: "editFormAndInputs-${env}")
+}
+
+type DeleteFormAndInputsResponse {
+  id: ID!
 }

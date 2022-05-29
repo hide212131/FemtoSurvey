@@ -2,6 +2,13 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const deleteFormAndInputs = /* GraphQL */ `
+  mutation DeleteFormAndInputs($formID: ID) {
+    deleteFormAndInputs(formID: $formID) {
+      id
+    }
+  }
+`;
 export const createSurveyForm = /* GraphQL */ `
   mutation CreateSurveyForm(
     $input: CreateSurveyFormInput!
@@ -15,11 +22,11 @@ export const createSurveyForm = /* GraphQL */ `
       createdBy
       inputKey
       resultKey
+      createdAt
+      updatedAt
       results {
         nextToken
       }
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -36,11 +43,11 @@ export const updateSurveyForm = /* GraphQL */ `
       createdBy
       inputKey
       resultKey
+      createdAt
+      updatedAt
       results {
         nextToken
       }
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -57,11 +64,11 @@ export const deleteSurveyForm = /* GraphQL */ `
       createdBy
       inputKey
       resultKey
+      createdAt
+      updatedAt
       results {
         nextToken
       }
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -74,6 +81,9 @@ export const createSurveyInput = /* GraphQL */ `
       id
       formID
       createdBy
+      content
+      createdAt
+      updatedAt
       form {
         id
         name
@@ -85,9 +95,6 @@ export const createSurveyInput = /* GraphQL */ `
         createdAt
         updatedAt
       }
-      content
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -100,6 +107,9 @@ export const updateSurveyInput = /* GraphQL */ `
       id
       formID
       createdBy
+      content
+      createdAt
+      updatedAt
       form {
         id
         name
@@ -111,9 +121,6 @@ export const updateSurveyInput = /* GraphQL */ `
         createdAt
         updatedAt
       }
-      content
-      createdAt
-      updatedAt
     }
   }
 `;
@@ -126,6 +133,9 @@ export const deleteSurveyInput = /* GraphQL */ `
       id
       formID
       createdBy
+      content
+      createdAt
+      updatedAt
       form {
         id
         name
@@ -137,9 +147,6 @@ export const deleteSurveyInput = /* GraphQL */ `
         createdAt
         updatedAt
       }
-      content
-      createdAt
-      updatedAt
     }
   }
 `;
